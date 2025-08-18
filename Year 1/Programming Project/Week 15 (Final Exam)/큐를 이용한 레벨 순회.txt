@@ -1,0 +1,93 @@
+#include<stdio.h>
+#include<stdlib.h>
+
+typedef int element;
+
+typedef struct TreeNode {
+	element data;
+	struct TreeNode* left;
+	struct TreeNode* right;
+}TreeNode;
+
+TreeNode* makeNode(element data, TreeNode* left, TreeNode* right) {
+	TreeNode* node = (TreeNode*)malloc(sizeof(TreeNode));
+	node->data = data;
+	node->left = left;
+	node->right = right;
+
+	return node;
+}
+#define SIZE 100
+
+typedef struct QueueType {
+	TreeNode* data[SIZE];
+	int front, rear;
+}QueueType;
+
+void initQueue(QueueType* Q) {
+	Q->front = Q->rear = 0;
+}
+
+int isQueueEmpty(QueueType* Q) {
+	return Q->rear == Q->front;
+}
+
+int isQueueFull(QueueType* Q) {
+	return Q->front == (Q->rear + 1) % SIZE;
+}
+
+void enqueue(QueueType* Q, TreeNode* e) {
+	if (isQueueFull(Q)) {
+		return;
+	}
+	else {
+		Q->rear = (Q->rear + 1) % SIZE;
+		Q->data[Q->rear] = e;
+	}
+}
+
+TreeNode* dequeue(QueueType* Q) {
+	if (isQueueEmpty(Q)) {
+		return NULL;
+	}
+	else {
+		TreeNode* e = NULL;
+		Q->front = (Q->front + 1) % SIZE;
+		return Q->data[Q->front];
+	}
+}
+
+void levelOrder(TreeNode* root) {
+	QueueType Q;
+	initQueue(&Q);
+
+	if (root == NULL) {
+		return;
+	}
+
+	enqueue(&Q, root);
+
+	while (!isQueueEmpty(&Q)) {
+		TreeNode* x = dequeue(&Q);
+		if (x) {
+			printf("[%d] ", x->data);
+		}
+		if (x->left) {
+			enqueue(&Q, x->left);
+		}
+		if (x->right) {
+			enqueue(&Q, x->right);
+		}
+	}
+}
+
+int main() {
+	TreeNode* N4 = makeNode(1, NULL, NULL);
+	TreeNode* N6 = makeNode(16, NULL, NULL);
+	TreeNode* N7 = makeNode(25, NULL, NULL);
+	TreeNode* N2 = makeNode(4, N4, NULL);
+	TreeNode* N3 = makeNode(20, N6, N7);
+	TreeNode* N1 = makeNode(15, N2, N3);
+
+	printf("Level: "); levelOrder(N1);
+}

@@ -1,0 +1,320 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include<stdio.h>
+#include<stdlib.h>
+#define N 10
+#define TRUE 1
+#define FALSE 0
+
+typedef char element;
+element visited[N] = { 0 };
+typedef struct StackType {
+	int stack[N];
+	int top;
+}StackType;
+void initStack(StackType* S) {
+	S->top = -1;
+}
+int isStackEmpty(StackType* S) {
+	return S->top == -1;
+}
+int isStackFull(StackType* S) {
+	return S->top == N - 1;
+}
+void printStack(StackType* S) {
+	if (isStackEmpty(S)) {
+		printf("Empty!");
+	}
+	else {
+		for (int i = 0; i <= S->top; i++) {
+			printf("%d   ", S->stack[i]);
+		}
+		printf("\n");
+	}
+}
+void push(StackType* S, int data) {
+	if (isStackFull(S)) {
+		printf("Full!");
+	}
+	else {
+		S->top++;
+		S->stack[S->top] = data;
+	}
+}
+int pop(StackType* S) {
+	if (isStackEmpty(S)) {
+		printf("Empty!");
+		return -1;
+	}
+	else {
+		int e = S->stack[S->top];
+		S->top--;
+		return e;
+	}
+}
+int stackPeek(StackType* S) {
+	return S->stack[S->top];
+}
+typedef struct QueueType {
+	element elem[N];
+	int front;
+	int rear;
+}QueueType;
+void initQueue(QueueType* Q) {
+	Q->front = Q->rear = 0;
+}
+int isEmpty(QueueType* Q) {
+	return Q->rear == Q->front;
+}
+int isFull(QueueType* Q) {
+	return (Q->rear) + 1 % N == Q->front;
+}
+void print(QueueType* Q) {
+	printf("front pos : %d, rear pos : %d\n", Q->front, Q->rear);
+
+	if (!isEmpty(Q)) {
+		int i = Q->front;
+		do {
+			i = (i + 1) % N;
+			printf("[%c] ", Q->elem[i]);
+			if (i == Q->rear)
+				break;
+		} while (i != Q->front);
+	}
+	printf("\n");
+}
+void enqueue(QueueType* Q, char e) {
+	if (isFull(Q)) {
+		printf("FULL");
+		return;
+	}
+	Q->rear = (Q->rear + 1) % N;
+	Q->elem[Q->rear] = e;
+}
+element dequeue(QueueType* Q) {
+	if (isEmpty(Q)) {
+		printf("EMPTY");
+		return 0;
+	}
+	Q->front = (Q->front + 1) % N;
+	return Q->elem[Q->front];
+}
+element peek(QueueType* Q) {
+	if (isEmpty(Q)) {
+		printf("EMPTY");
+		return 0;
+	}
+	return Q->elem[Q->front + 1];
+}
+
+typedef struct Vertax {
+	element vName;
+	int isVisit;
+	struct AdjacentVertax* aHead;
+	struct Vertax* next;
+}Vertax;
+
+typedef struct AdjacentVertax {
+	element aName;
+	struct AdjacentVertax* aHead;
+	struct AdjacentVertax* next;
+}AdjacentVertax;
+
+typedef struct {
+	Vertax* vHead;
+}GraphType;
+
+void initGraph(GraphType* G) {
+	G->vHead = NULL;
+}
+
+void makeVertax(GraphType* G, element vName) {
+	Vertax* v = (Vertax*)malloc(sizeof(Vertax));
+	v->vName = vName;
+	v->isVisit = FALSE;
+	v->aHead = NULL;
+	v->next = NULL;
+
+	Vertax* p = G->vHead;
+
+	if (p == NULL) { // 그래프에 정점이 없다
+		G->vHead = v;
+	}
+	else { // 비어 있지 않으면 맨 뒤로 가서 붙어야함
+		while (p->next != NULL) {
+			p = p->next;
+		}
+		p->next = v;
+	}
+}
+
+void printGraph(GraphType* G) {
+	Vertax* p = NULL;
+	AdjacentVertax* q = NULL;
+
+	for(p = G->vHead; p != NULL; p = p->next) {
+		printf("[%c]  ", p->vName);
+		for (q = p->aHead; q != NULL; q = q->next) {
+			printf("[%c]   ", q->aName);
+		}
+		printf("\n");
+	}
+}
+
+Vertax* findVertax(GraphType* G, element vName) {
+	Vertax* p = G->vHead;
+
+	while (p->vName != vName) {
+		p = p->next;
+	}
+	return p;
+}
+
+void makeAdjacentVertax(Vertax* v, element aName) {
+	AdjacentVertax* a = (AdjacentVertax*)malloc(sizeof(AdjacentVertax));
+	a->aName = aName;
+	a->next = NULL;
+
+	AdjacentVertax* p = v->aHead;
+
+	if (p == NULL) {
+		v->aHead = a;
+	}
+	else {
+		while (p->next != NULL) {
+			p = p->next;
+		}
+		p->next = a;
+	}
+
+}
+
+void insertEdge(GraphType* G, element v1, element v2) {
+	Vertax* v = findVertax(G, v1);
+	makeAdjacentVertax(v, v2); // 위에서 찾은 정점과 v2를 보내서 둘이 사랑의 작대기를 그어주는 향수(함수 qudtls아)
+
+    v = findVertax(G, v2);
+	makeAdjacentVertax(v, v1); // 쌍방 사랑의 작대기를 그어주는 함수
+
+}
+
+void rDFS(GraphType* G, element vName) {
+	Vertax* v = findVertax(G, vName);
+	AdjacentVertax* a = NULL;
+
+	if (v->isVisit == FALSE) {
+		v->isVisit = TRUE;
+		printf("[%c]   ", v->vName);
+	}
+	for (a = v->aHead; a != NULL; a = a->next) {
+		v = findVertax(G, a->aName);
+		if (v->isVisit == FALSE) {
+			rDFS(G, v->vName);
+		}
+	}
+}
+
+void BFS_mine(GraphType* G, element vName) {
+	QueueType Q;
+	initQueue(&Q);
+	Vertax* v;
+	AdjacentVertax* a=NULL;
+
+	enqueue(&Q, vName);
+
+	while (!isEmpty(&Q)) {
+		vName = dequeue(&Q);
+		v = findVertax(G, vName);
+
+		if (v->isVisit == FALSE) {
+			v->isVisit = TRUE;
+			printf("[%c]   ", v->vName);
+
+			for (a = v->aHead; a != NULL; a = a->next) {
+				v = findVertax(G, a->aName);
+				if (v->isVisit == FALSE) {
+					enqueue(&Q, a->aName);
+				}
+			}
+		}
+	}
+}
+
+void BFS(GraphType* G, element vName) {
+	QueueType Q;
+	initQueue(&Q);
+
+	AdjacentVertax* a;
+
+	Vertax* v = findVertax(G, vName);
+	v->isVisit = TRUE;
+	printf("[%c]   ", v->vName);
+	enqueue(&Q, v->vName);
+
+	while (!isEmpty(&Q)) {
+		v = findVertax(G, dequeue(&Q));
+		for (a = v->aHead; a != NULL; a = a->next) {
+			v = findVertax(G, a->aName);
+			if (v->isVisit == FALSE) {
+				v->isVisit = TRUE;
+				printf("[%c]   ", v->vName);
+				enqueue(&Q, vName);
+			}
+		}
+	}
+}
+
+void DFS_iterative(GraphType* G, element vName) {
+	StackType S;
+	initStack(&S);
+	Vertax* v = NULL;
+	AdjacentVertax* a = NULL;
+
+	push(&S, vName);
+	int flag;
+
+	while (!isStackEmpty(&S)) {
+		vName = stackPeek(&S);
+		v = findVertax(G, vName);
+
+		if (v->isVisit == FALSE) {
+			v->isVisit = TRUE;
+			printf("[%c]   ", v->vName);
+		}
+
+		flag = TRUE;
+
+		for (a = v->aHead; a != NULL; a = a->next) {
+			v = findVertax(G, a->aName);
+
+			if (v->isVisit == FALSE) {
+				v->isVisit = TRUE;
+				printf("[%c]   ", v->vName);
+				push(&S, v->vName);
+				flag = FALSE;
+				break;
+			}
+		}
+
+		if (flag == TRUE) {
+			pop(&S);
+		}
+	}
+}
+
+
+int main() {
+	GraphType G;
+	initGraph(&G);
+
+	makeVertax(&G,'a'); makeVertax(&G, 'b'); makeVertax(&G, 'c'); makeVertax(&G, 'd'); makeVertax(&G, 'e'); makeVertax(&G, 'f'); makeVertax(&G, 'g');
+
+	insertEdge(&G, 'a', 'b'); insertEdge(&G, 'a', 'f'); 
+	insertEdge(&G, 'b', 'c'); insertEdge(&G, 'b', 'g'); 
+	insertEdge(&G, 'c', 'd');
+	insertEdge(&G, 'd', 'e'); insertEdge(&G, 'd', 'g');
+	insertEdge(&G, 'e', 'f'); insertEdge(&G, 'e', 'g');
+	printGraph(&G);
+
+	// printf("rDFS: "); rDFS(&G, 'g'); printf("\n");
+	printf("DFS_iterative: "); DFS_iterative(&G, 'g');
+}

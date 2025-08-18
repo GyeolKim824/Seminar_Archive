@@ -1,0 +1,98 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include<stdio.h>
+#include<stdlib.h>
+
+// 힙
+
+#define N 100
+
+typedef int element;
+
+typedef struct HeapType {
+	element heap[N];
+	int heapSize;
+}HeapType;
+
+void initHeap(HeapType* H) {
+	H->heapSize = 0;
+}
+
+void upHeap(HeapType* H) { // 노드 삽입
+	int i = H->heapSize;
+	element key = H->heap[i];
+
+	while ((i != 1) && (key > H->heap[i / 2])) { // 부모노드까지 올라가거나(i=1) 키값이 부모노드의 것보다 작을 때까지 반복
+		H->heap[i] = H->heap[i / 2]; // 부모 노드의 값을 자식 노드의 값에 복사
+		i = i / 2; 
+		H->heap[i] = key; // 키값 부모노드한테 넣어줌
+	}
+	H->heap[i] = key; 
+}
+
+void downHeap(HeapType* H) { // 가장 큰 값을 가지고 있는 루트 노드를 삭제하고 힙을 다시 구성하는 함수
+	element item = H->heap[1]; // 아이템=루트 노드의 값
+	int parent = 1, child = 2; 
+
+	while (child <= H->heapSize) { // 자식노드가 존재하는 동안
+		if ((child < H->heapSize) && (H->heap[child + 1]) > H->heap[child]) { 차일드가 사이즈보다 작고 오른쪽 노드의 값이 더 크다면
+			child++; // 오른쪽 노드로 자식 노드를 갱신
+		}
+		if (item >= H->heap[child]) {
+			break; // 현재 검사중인 item의 값이 자식보다 크면->힙 속성 만족해서 종료
+		}
+		H->heap[parent] = H->heap[child]; // 부모 노드에 자식 노드의 값 삽입
+		parent = child; // 부모 자식 인덱스 교환
+		child *= 2; // 왼쪽 자식 노드로 이동
+	}
+	H->heap[parent] = item; 
+}
+
+void insertItem(HeapType* H, element key) {
+	H->heapSize++;
+	H->heap[H->heapSize] = key;
+	upHeap(H);
+}
+
+element removeItem(HeapType* H) {
+	element item = H->heap[1];
+
+	H->heap[1] = H->heap[H->heapSize];
+	H->heapSize--;
+	downHeap(H);
+
+	return item;
+}
+
+void heapSort(HeapType* H) {
+	int n = H->heapSize;
+	element A[n];
+	for (int i = n - 1; i >= 0; i--) {
+		A[i] = removeItem(H);
+	}
+	for (int i = 0; i < n; i++) {
+		printf("[%d]   ", A[i]);
+	}
+	printf("\n");
+}
+
+void printHeap(HeapType* H) {
+	for (int i = 1; i <= H->heapSize; i++) {
+		printf("[%d]  ", H->heap[i]);
+	}
+	printf("\n");
+}
+
+
+int main() {
+	HeapType H;
+	initHeap(&H);
+
+	insertItem(&H, 9); insertItem(&H, 7); insertItem(&H, 6);
+	insertItem(&H, 5); insertItem(&H, 4); insertItem(&H, 3);
+	insertItem(&H, 2); insertItem(&H, 2); insertItem(&H, 1);
+	insertItem(&H, 3); printHeap(&H); getchar();
+
+	// insertItem(&H, 8); printHeap(&H);
+
+	removeItem(&H); printHeap(&H);
+}

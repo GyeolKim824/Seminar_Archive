@@ -1,0 +1,81 @@
+#include<stdio.h>
+#include<stdlib.h>
+
+typedef int element;
+
+typedef struct TreeNode {
+	element data;
+	struct TreeNode* left;
+	struct TreeNode* right;
+}TreeNode;
+
+TreeNode* makeNode(element data, TreeNode* left, TreeNode* right) {
+	TreeNode* node = (TreeNode*)malloc(sizeof(TreeNode));
+	node->data = data;
+	node->left = left;
+	node->right = right;
+
+	return node;
+}
+
+#define SIZE 10
+
+typedef struct StackType {
+	int top;
+	TreeNode* data[SIZE];
+}StackType;
+
+void initStack(StackType*S){
+	S->top = -1;
+}
+
+void push(StackType* S, TreeNode*e) {
+	if (S->top < SIZE - 1) {
+		S->data[++S->top] = e;
+	}
+	else {
+		return;
+	}
+}
+
+TreeNode* pop(StackType* S) {
+	TreeNode* e = NULL;
+
+	if (S->top >= 0) {
+		e = S->data[S->top--];
+	}
+		return e;
+}
+
+void iterInOrder(TreeNode* root) {
+	StackType S;
+	initStack(&S);
+	
+	while (1) {
+		for (; root != NULL; root = root->left) {
+			push(&S, root);
+		}
+		root = pop(&S);
+
+		if (root == NULL) {
+			break;
+		}
+
+		printf("[%d] ", root->data);
+		root = root->right;
+	}
+}
+
+
+int main() {
+	TreeNode* N4 = makeNode(1, NULL, NULL);
+	TreeNode* N6 = makeNode(16, NULL, NULL);
+	TreeNode* N7 = makeNode(25, NULL, NULL);
+	TreeNode* N2 = makeNode(4, N4, NULL);
+	TreeNode* N3 = makeNode(20, N6, N7);
+	TreeNode* N1 = makeNode(15, N2, N3);
+
+	// printf("Pre: "); preOrder(N1); printf("\n");
+	printf("Iter In: "); iterInOrder(N1); printf("\n");
+	// printf("Post: "); postOrder(N1); printf("\n");
+}

@@ -1,0 +1,198 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
+#include <stdlib.h>
+
+#define M 13
+
+typedef struct
+{
+    int key;
+    int probeCount; //몇 번 열어서 방을 찾는지?
+}Bucket;
+
+typedef struct
+{
+    Bucket A[M];
+}HashType;
+
+void init(HashType* H)
+{
+    for (int i = 0; i < M; i++)
+    {
+        H->A[i].key = 0;
+        H->A[i].probeCount=0;
+    }
+}
+
+int isEmpty(HashType* H, int b)
+{
+    return H->A[b].key == 0;
+}
+
+int h(int key)
+{
+    return key % M;
+}
+
+int h2(int key)
+{
+    return 11 - (key % 11);
+}
+
+int getNextBucketLinear(int v, int i)
+{
+    return (v + i) % M;
+}
+
+int getNextBucketQuadratic(int v, int i)
+{
+    return (v + i * i) % M;
+}
+
+int getNextBucketDouble(int v, int i, int key)
+{
+    return (v + i * h2(key)) % M;
+}
+
+void insertItem(HashType* H, int key)
+{
+    int v = h(key);
+    int i = 0; //몇 번 방문을 열어봤는지 
+    int count = 0;
+
+    while (i < M)
+    {
+        count++;
+        int b = getNextBucketLinear(v, i);
+        //int b = getNextBucketQuadratic(v, i);
+        //int b = getNextBucketDouble(v, i, key);
+
+        if (isEmpty(H, b))
+        {
+            H->A[b].key = key;
+            H->A[b].probeCount = count;
+            return;
+        }
+        else {
+            i++;
+        }
+    }
+}
+
+int findItem(HashType* H, int key)
+{
+    int v = h(key);
+    int i = 0; //몇 번 방문을 열어봤는지 
+
+    while (i < M)
+    {
+        int b = getNextBucketLinear(v, i);
+        //int b = getNextBucketQuadratic(v, i);
+        //int b = getNextBucketDouble(v, i, key);
+
+        if (isEmpty(H, b))
+        {
+            return 0;
+        }
+        else if(H->A[b].key==key){
+            return key;
+        }
+        else
+            i++;
+    }
+    return 0;
+}
+
+int deleteItem(HashType* H, int key) {
+    int v = h(key);
+    int i = 0; //몇 번 방문을 열어봤는지 
+
+    while (i < M)
+    {
+        int b = getNextBucketLinear(v, i);
+        //int b = getNextBucketQuadratic(v, i);
+        //int b = getNextBucketDouble(v, i, key);
+
+        if (isEmpty(H, b))
+        {
+            return 0;
+        }
+        else if (H->A[b].key == key) {
+            H->A[b].key = -1;
+            H->A[b].probeCount = 0;
+            return key;
+        }
+        else
+            i++;
+    }
+    return 0;
+}
+
+void print(HashType* H)
+{
+    for (int i = 0; i < M; i++)
+        printf(" %2d", H->A[i].key);
+    printf("\n");
+
+}
+
+void printHash(HashType* H)
+{
+    printf("Bucket  Key  Probe\n");
+    printf("==================\n");
+
+    for (int i = 0; i < M; i++)
+        printf("HT[%02d] : %2d  %d\n", i, H->A[i].key, H->A[i].probeCount);
+}
+
+int main()
+{
+    HashType H;
+    init(&H);
+
+    int data[] = { 25, 13, 16, 15, 7, 28, 31, 20, 1, 38 };
+
+    printf("h(key)     0  1  2  3  4  5  6  7  8  9  10 11 12\n");
+    printf("========  ======================================\n");
+
+    for (int i = 0; i < 10; i++)
+    {
+        printf("h(%02d):%2d ", data[i], h(data[i]));
+        insertItem(&H, data[i]);
+        print(&H);
+
+    }
+
+    printHash(&H);
+
+    int key;
+
+    printf("\nInput  Search  Key: ");
+    scanf("%d", &key);
+    if (findItem(&H, key)) {
+        printf("%d Exist.\n", key);
+    }
+    else {
+        printf("%d not Exist.\n", key);
+    }
+
+    printf("\nInput  Delete  Key: ");
+    scanf("%d", &key);
+    if (deleteItem(&H, key)) {
+        printf("%d Deleted.\n", key);
+    }
+    else {
+        printf("%d not Exist.\n", key);
+    }
+
+    printf("\nInput  Search  Key: ");
+    scanf("%d", &key);
+    if (findItem(&H, key)) {
+        printf("%d Exist.\n", key);
+    }
+    else {
+        printf("%d not Exist.\n", key);
+    }
+    printHash(&H);
+
+    return 0;
