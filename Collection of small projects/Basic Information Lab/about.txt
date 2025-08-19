@@ -1,0 +1,2 @@
+These are reports I compiled from the Basic Information Laboratory course taken in Fall 2024.
+All reports are written in English, and the course involved constructing basic circuits learned in Circuit Theory and experimenting with concepts from Network Theory.
