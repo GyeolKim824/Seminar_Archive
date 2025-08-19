@@ -1,0 +1,2 @@
+These are reports I wrote in Korean while personally studying after taking an Algorithms course in Spring 2024.
+They also include some codes where I attempted FFT and logistic regression.
