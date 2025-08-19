@@ -4,6 +4,8 @@ Hi, I am GYEOL KIM.
 This repository archives my study materials and exercises from two seminar-style learning during my undergraduate studies.
 
 ## About
+- Not seminars, but just some little projects I tried on my own during my undergrad life — my small experiments collected
+  
 - Machine Learning (Winter 2024)
   Conducted during the winter break of 2024 with my professor and a small group of students.  
   We explored fundamental ML models and implemented them through collaborative self-study.
