@@ -1,4 +1,4 @@
-# Undergraduate_Archive
+# Undergraduate_Seminars_Archive
 
 Hi, I am GYEOL KIM
 - Undergraduate student
